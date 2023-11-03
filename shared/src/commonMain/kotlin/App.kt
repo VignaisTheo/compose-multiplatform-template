@@ -119,9 +119,16 @@ fun Column1() {
 
     Text("Skills",
         fontWeight = FontWeight.Bold,
-        fontSize = 22.sp, modifier = Modifier.padding(15.dp))
+        fontSize = 20.sp, modifier = Modifier.padding(15.dp))
 
     listOfSkill.forEach { Skill -> Column1_Skill(Skill) }
+
+    Divider(Modifier.width(150.dp).padding(15.dp))
+
+    Text("Hobbies",
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp, modifier = Modifier.padding(15.dp))
+
     listOfHobbies.forEach { Hobbie -> Column1_Hobbie(Hobbie) }
 
 }
