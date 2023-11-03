@@ -3,10 +3,11 @@ import androidx.compose.runtime.Composable
 
 actual fun getPlatformName(): String = "Desktop"
 
-@Composable fun MainView() = App()
-
+//@Composable fun MainView() = ScoreScreen("20/20")
+//@Composable fun MainView() = WelcomeScreen()
+@Composable fun MainView() = Cv()
 @Preview
 @Composable
 fun AppPreview() {
-    App()
+    Cv()
 }
