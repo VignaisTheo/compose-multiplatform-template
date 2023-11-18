@@ -31,18 +31,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-data class Reponses(val id : Int,val label :String)
-data class Questions(val label:String,val correctIdInt :Int,val lesReponses:List<Reponses>)
-data class Quizz(val lesQuestions : List<Questions>)
-
+import kotlinx.serialization.SerialInfo
+import kotlinx.serialization.SerialName
+import network.data.Answer
+import network.data.Question
+import network.data.Quiz
 
 //Déroulé du Quizz
-val listOfReponses1 = listOf<Reponses>(Reponses(1,"1"),Reponses(2,"2"),Reponses(3,"3"))
-val listOfReponses2 = listOf<Reponses>(Reponses(4,"Oui"),Reponses(5,"Non"),Reponses(6,"De temps en temps"))
-val listOfReponses3 = listOf<Reponses>(Reponses(7,"Pourquoi pas ?"),Reponses(8,"Parceque"),Reponses(9,"feur"))
-val listOfQuestions = listOf<Questions>(Questions("1 + 1 = ?",2,listOfReponses1),Questions("Jules est intelligent ?",4,listOfReponses2),Questions("Pourquoi ?",9,listOfReponses3))
-val unQuizz = Quizz(listOfQuestions)
+val listOfReponses1 = listOf<Answer>(Answer(1,"1"),Answer(2,"2"),Answer(3,"3"))
+val listOfReponses2 = listOf<Answer>(Answer(4,"Oui"),Answer(5,"Non"),Answer(6,"De temps en temps"))
+val listOfReponses3 = listOf<Answer>(Answer(7,"Pourquoi pas ?"),Answer(8,"Parceque"),Answer(9,"feur"))
+val listOfQuestions = listOf<Question>(Question(1,"1 + 1 = ?",2,listOfReponses1),Question(2,"Jules est intelligent ?",4,listOfReponses2),Question(3,"Pourquoi ?",9,listOfReponses3))
+val unQuizz = Quiz(listOfQuestions)
 
 var nb = 0
 
@@ -50,6 +50,7 @@ var nb = 0
 @Composable
 fun QuestionScreen() {
     MaterialTheme{
+
         val (selectedOption, onOptionSelected) = remember { mutableStateOf(listOfReponses1[1] ) }
 
         var buttonText = "   Next !   "
@@ -57,25 +58,25 @@ fun QuestionScreen() {
         var score by remember { mutableStateOf(0) }
         val nbquestion = 3
 
-
-        Column (modifier = Modifier.background(color = Color.LightGray).fillMaxHeight()){
-            Row(modifier = Modifier.fillMaxWidth()){
+        Column (modifier = Modifier.fillMaxHeight().background(color = Color.White)){
+            Row(modifier = Modifier.padding(20.dp).border(3.dp, color = Color.Black, shape = RoundedCornerShape(10)).fillMaxWidth()){
 
                 //box avec la question
                 Box(modifier=Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
-                    Card(modifier = Modifier.padding(20.dp).fillMaxWidth()) {
-                        Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.Center){
+                    Card(modifier = Modifier.padding(0.dp).fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(0.dp).background(color = Color.LightGray), verticalArrangement = Arrangement.Center){
                             Text(unQuizz.lesQuestions[questionProgress].label, color = Color.DarkGray, fontSize = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp).align(Alignment.CenterHorizontally))
                             Text("Votre score est de : " + score , color = Color.DarkGray, fontSize = 35.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp).align(Alignment.CenterHorizontally))
                         }
+
                     }
                 }
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
 
                 //Contenu des Réponses
-                Column(modifier = Modifier.background(color = Color.White).padding(30.dp).border(3.dp, color = Color.Black, shape = RoundedCornerShape(10))) {
-                    unQuizz.lesQuestions[questionProgress].lesReponses.forEach { text -> Row ( modifier = Modifier
+                Column(modifier = Modifier.background(color = Color.White).padding(0.dp).border(3.dp, color = Color.Black, shape = RoundedCornerShape(10))) {
+                    unQuizz.lesQuestions[questionProgress].answers.forEach { text -> Row ( modifier = Modifier
 
                         //.selectable(
                         //selected = text == selectedOption,
@@ -103,19 +104,19 @@ fun QuestionScreen() {
             }
 
             //Bouton Next !
-            Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+            Row (modifier = Modifier.fillMaxWidth().padding(top = 20.dp), horizontalArrangement = Arrangement.Center){
                 Button(modifier = Modifier, onClick = {
 
                     //Réponse correct
                     if (questionProgress < nbquestion-1){
-                        if (selectedOption.id==unQuizz.lesQuestions[questionProgress].correctIdInt){
+                        if (selectedOption.id==unQuizz.lesQuestions[questionProgress].correctAnswerId){
                             score++
                         }
                         nb++
                         questionProgress++
-                    }else if(nb === 2 ){
+                    }else if(nb == 2 ){
 
-                        if (selectedOption.id==unQuizz.lesQuestions[questionProgress].correctIdInt){
+                        if (selectedOption.id==unQuizz.lesQuestions[questionProgress].correctAnswerId){
                             score++
                         }
                         buttonText = "   Done !   "
@@ -130,11 +131,12 @@ fun QuestionScreen() {
                     Text(buttonText, fontSize = 22.sp)
                 }
             }
+
             //Bottom bar de l'avancement du Quizz
             Scaffold(
                 bottomBar = {
                     BottomAppBar(modifier = Modifier.height(10.dp).fillMaxWidth(), backgroundColor = Color.Transparent) { /* Bottom app bar content */
-                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth().height(10.dp),progress = ((questionProgress+1).toFloat()/nbquestion), color = Color.Red)
+                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth().height(10.dp),progress = ((questionProgress+1).toFloat()/unQuizz.lesQuestions.size), color = Color.Red)
                     }
                 }
             ){}
