@@ -21,7 +21,7 @@ class QuizRepository (){
         updateQuiz()
     }
 
-    private suspend fun fetchQuiz(): List<Question> = quizAPI.getAllQuestions().lesQuestions
+    private suspend fun fetchQuiz(): List<Question> = quizAPI.getAllQuestions().questions
 
     
 

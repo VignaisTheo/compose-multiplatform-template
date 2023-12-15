@@ -21,6 +21,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.serialization.SerialInfo
 import kotlinx.serialization.SerialName
+import network.QuizRepository
 import network.data.Answer
 import network.data.Question
 import network.data.Quiz
@@ -42,21 +44,21 @@ val listOfReponses1 = listOf<Answer>(Answer(1,"1"),Answer(2,"2"),Answer(3,"3"))
 val listOfReponses2 = listOf<Answer>(Answer(4,"Oui"),Answer(5,"Non"),Answer(6,"De temps en temps"))
 val listOfReponses3 = listOf<Answer>(Answer(7,"Pourquoi pas ?"),Answer(8,"Parceque"),Answer(9,"feur"))
 val listOfQuestions = listOf<Question>(Question(1,"1 + 1 = ?",2,listOfReponses1),Question(2,"Jules est intelligent ?",4,listOfReponses2),Question(3,"Pourquoi ?",9,listOfReponses3))
-val unQuizz = Quiz(listOfQuestions)
+var unQuizz = Quiz(listOfQuestions)
 
-var nb = 0
 
 
 @Composable
-fun QuestionScreen() {
+internal fun QuestionScreen(lesQuestions: List<Question>) {
     MaterialTheme{
 
         val (selectedOption, onOptionSelected) = remember { mutableStateOf(listOfReponses1[1] ) }
 
+        var nb by remember { mutableStateOf( 0) }
         var buttonText = "   Next !   "
         var questionProgress by remember { mutableStateOf(0) }
         var score by remember { mutableStateOf(0) }
-        val nbquestion = 3
+        //val nbquestion = 3
 
         Column (modifier = Modifier.fillMaxHeight().background(color = Color.White)){
             Row(modifier = Modifier.padding(20.dp).border(3.dp, color = Color.Black, shape = RoundedCornerShape(10)).fillMaxWidth()){
@@ -65,7 +67,7 @@ fun QuestionScreen() {
                 Box(modifier=Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
                     Card(modifier = Modifier.padding(0.dp).fillMaxWidth()) {
                         Column(modifier = Modifier.padding(0.dp).background(color = Color.LightGray), verticalArrangement = Arrangement.Center){
-                            Text(unQuizz.lesQuestions[questionProgress].label, color = Color.DarkGray, fontSize = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp).align(Alignment.CenterHorizontally))
+                            Text(lesQuestions[questionProgress].label, color = Color.DarkGray, fontSize = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp).align(Alignment.CenterHorizontally))
                             Text("Votre score est de : " + score , color = Color.DarkGray, fontSize = 35.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(10.dp).align(Alignment.CenterHorizontally))
                         }
 
@@ -76,14 +78,7 @@ fun QuestionScreen() {
 
                 //Contenu des Réponses
                 Column(modifier = Modifier.background(color = Color.White).padding(0.dp).border(3.dp, color = Color.Black, shape = RoundedCornerShape(10))) {
-                    unQuizz.lesQuestions[questionProgress].answers.forEach { text -> Row ( modifier = Modifier
-
-                        //.selectable(
-                        //selected = text == selectedOption,
-                        //  onClick = {}
-                        //)
-                        .padding(0.dp)
-                    )
+                    lesQuestions[questionProgress].answers.forEach { text -> Row ( modifier = Modifier.padding(0.dp))
                     {
                         Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
                             RadioButton(
@@ -108,21 +103,40 @@ fun QuestionScreen() {
                 Button(modifier = Modifier, onClick = {
 
                     //Réponse correct
-                    if (questionProgress < nbquestion-1){
-                        if (selectedOption.id==unQuizz.lesQuestions[questionProgress].correctAnswerId){
+                    nb++
+
+                    //SI la taille est égale ou dépassée
+                    if (lesQuestions.size >= nb+1){
+                        if(selectedOption.id == lesQuestions[questionProgress].correctAnswerId)
+                        {
                             score++
                         }
-                        nb++
                         questionProgress++
-                    }else if(nb == 2 ){
-
-                        if (selectedOption.id==unQuizz.lesQuestions[questionProgress].correctAnswerId){
+                    }
+                    else if (lesQuestions.size == nb){
+                        if(selectedOption.id == lesQuestions[questionProgress].correctAnswerId)
+                        {
                             score++
                         }
-                        buttonText = "   Done !   "
-                        nb++
-
+                        //questionProgress++
                     }
+
+
+//                    if (questionProgress < nbquestion-1){
+//                        if (selectedOption.id==lesQuestions[questionProgress].correctAnswerId){
+//                            score++
+//                        }
+//                        nb++
+//                        questionProgress++
+//                    }else if(nb == 2 ){
+//
+//                        if (selectedOption.id==lesQuestions[questionProgress].correctAnswerId){
+//                            score++
+//                        }
+//                        buttonText = "   Done !   "
+//                        nb++
+//
+//                    }
 
                 })
 
@@ -136,7 +150,7 @@ fun QuestionScreen() {
             Scaffold(
                 bottomBar = {
                     BottomAppBar(modifier = Modifier.height(10.dp).fillMaxWidth(), backgroundColor = Color.Transparent) { /* Bottom app bar content */
-                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth().height(10.dp),progress = ((questionProgress+1).toFloat()/unQuizz.lesQuestions.size), color = Color.Red)
+                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth().height(10.dp),progress = ((questionProgress+1).toFloat()/lesQuestions.size), color = Color.Red)
                     }
                 }
             ){}

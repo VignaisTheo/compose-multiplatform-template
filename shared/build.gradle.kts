@@ -30,6 +30,7 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
+                api("moe.tlaster:precompose:1.5.7")
                 implementation("io.ktor:ktor-client-core:2.3.4") // core source of ktor
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") // For making asynchronous calls
                 implementation("io.ktor:ktor-client-content-negotiation:2.3.4") // Simplify handling of content type based deserialization

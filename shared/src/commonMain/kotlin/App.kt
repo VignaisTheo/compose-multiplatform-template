@@ -17,6 +17,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import network.QuizRepository
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -43,6 +45,8 @@ val listOfExp = listOf<Exp>(Exp("Mes Études","2023 : J'ai fais du kotlin","2022
 val listOfSkill = listOf<Skill>(Skill("C#"),Skill("Kotlin"),Skill("Java"),Skill("SQL"),Skill("C"),Skill("Python"))
 val listOfHobbies = listOf<Hobbie>(Hobbie("Jeux Vidéos"),Hobbie("Sports"),Hobbie("Paris sportifs"))
 
+private val repository = QuizRepository()
+
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun App() {
@@ -51,6 +55,13 @@ fun App() {
         var greetingText by remember { mutableStateOf("Hello, World!") }
         var showImage by remember { mutableStateOf(false) }
 
+        val questions = repository.questionState.collectAsState()
+
+        if(questions.value.isNotEmpty()) {
+            QuestionScreen(questions.value)
+        }
+
+        /*
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Button(onClick = {
                 greetingText = "Hello, ${getPlatformName()}"
@@ -64,7 +75,7 @@ fun App() {
                     contentDescription = "Compose Multiplatform icon"
                 )
             }
-        }
+        }*/
     }
 }
 

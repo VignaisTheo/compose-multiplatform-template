@@ -1,6 +1,6 @@
 package network
 
-import Quiz
+//import Quiz
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -24,6 +24,9 @@ class QuizAPI {
         }
     }
     suspend fun getAllQuestions(): Quiz {
+
         return httpClient.get("https://awl.li/devoxxkmm2023").body()
+
+
     }
 }
